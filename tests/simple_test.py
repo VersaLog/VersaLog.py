@@ -1,7 +1,7 @@
 from VersaLog import *
 
 # show_file False
-logger = VersaLog(mode="simple")
+logger = VersaLog(mode="simple", show_file=False)
 logger.info("ok")
 logger.err("err")
 logger.war("war")
