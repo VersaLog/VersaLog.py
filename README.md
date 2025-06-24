@@ -1,6 +1,6 @@
 # VersaLog
 
-![logo](/image/VersaLog.png)
+<img src="/image/VersaLog.png" width="500" height="167" />
 
 ## VersaLog とは
 
