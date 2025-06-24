@@ -53,7 +53,7 @@ class VersaLog:
         elif self.mode == "file":
             formatted = f"[{caller}]{colors}[{types}]{self.RESET} {msg}"
 
-        else:  # detailed
+        else:
             time = self.GetTime()
             if self.show_file:
                 formatted = f"[{time}]{colors}[{types}]{self.RESET}[{caller}] : {msg}"
