@@ -11,10 +11,11 @@
 ## インストール方法
 
 ```
-pip install git+https://github.com/kayu0514/VersaLog.git
+pip install git+https://github.com/kayu0514/VersaLog.py.git
 ```
 
 ## サンプル
 
 **シンプル** : [タップ](/tests/simple_test.py)
+
 **ディーテイルド** : [タップ](/tests/detailed_test.py)

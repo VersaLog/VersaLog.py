@@ -11,7 +11,7 @@ VersaLog is a library that enables highly functional and flexible logging.
 ## Installation
 
 ```
-pip install git+https://github.com/kayu0514/VersaLog.git
+pip install git+https://github.com/kayu0514/VersaLog.py.git
 ```
 
 ## Sample
