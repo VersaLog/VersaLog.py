@@ -19,3 +19,5 @@ pip install git+https://github.com/kayu0514/VersaLog.py.git
 **シンプル** : [タップ](/tests/simple_test.py)
 
 **ディーテイルド** : [タップ](/tests/detailed_test.py)
+
+**ファイル** : [タップ](/tests/file_test.py)

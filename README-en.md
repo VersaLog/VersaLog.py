@@ -18,3 +18,4 @@ pip install git+https://github.com/kayu0514/VersaLog.py.git
 
 **Simple** : [Tap](/tests/simple_test.py)  
 **Detailed** : [Tap](/tests/detailed_test.py)
+**File** : [Tap](/tests/file_test.py)
