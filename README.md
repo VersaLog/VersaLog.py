@@ -14,6 +14,12 @@
 pip install git+https://github.com/kayu0514/VersaLog.py.git
 ```
 
+## アップデート方法
+
+```
+pip install --upgrade --force-reinstall git+https://github.com/kayu0514/VersaLog.py.git
+```
+
 ## サンプル
 
 **シンプル** : [タップ](/tests/simple_test.py)
