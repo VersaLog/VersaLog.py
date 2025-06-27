@@ -1,8 +1,8 @@
-# VersaLog
+# VersaLog.py
 
 ![logo](/image/logo.png)
 
-## What is VersaLog?
+## What is VersaLog.py?
 
 VersaLog is a library that enables highly functional and flexible logging.
 
