@@ -2,5 +2,7 @@ from VersaLog import *
 
 logger = VersaLog(mode="file")
 logger.info("ok")
-logger.err("err")
-logger.war("war")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")
