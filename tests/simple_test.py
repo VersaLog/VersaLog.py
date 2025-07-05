@@ -3,11 +3,15 @@ from VersaLog import *
 # show_file False
 logger = VersaLog(mode="simple", show_file=False)
 logger.info("ok")
-logger.err("err")
-logger.war("war")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")
 
 # show_file True
 logger = VersaLog(mode="simple", show_file=True)
 logger.info("ok")
-logger.err("err")
-logger.war("war")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")
