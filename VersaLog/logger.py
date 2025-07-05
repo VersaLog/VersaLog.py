@@ -6,12 +6,16 @@ class VersaLog:
         "INFO": "\033[32m",
         "ERROR": "\033[31m",
         "WARNING": "\033[33m",
+        "DEBUG": "\033[36m",
+        "CRITICAL": "\033[35m",
     }
 
     SYMBOLS = {
         "INFO": "[+]",
         "ERROR": "[-]",
         "WARNING": "[!]",
+        "DEBUG": "[D]",
+        "CRITICAL": "[C]",
     }
     
     RESET = "\033[0m"
@@ -27,6 +31,12 @@ class VersaLog:
         """
         self.mode = mode.lower()
         self.show_file = show_file
+
+        valid_modes = ["simple", "detailed", "file"]
+        
+        if self.mode not in valid_modes:
+            raise ValueError(f"Invalid mode '{mode}' specified. Valid modes are: {', '.join(valid_modes)}")
+        
 
     def GetTime(self) -> str:
         return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -65,8 +75,14 @@ class VersaLog:
     def info(self, msg: str) -> None:
         self.Log(msg, "INFO")
 
-    def err(self, msg: str) -> None:
+    def error(self, msg: str) -> None:
         self.Log(msg, "ERROR")
 
-    def war(self, msg: str) -> None:
+    def warning(self, msg: str) -> None:
         self.Log(msg, "WARNING")
+
+    def debug(self, msg: str) -> None:
+        self.Log(msg, "DEBUG")
+
+    def critical(self, msg: str) -> None:
+        self.Log(msg, "CRITICAL")
