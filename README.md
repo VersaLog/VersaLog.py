@@ -11,13 +11,7 @@
 ## インストール方法
 
 ```
-pip install git+https://github.com/kayu0514/VersaLog.py.git
-```
-
-## アップデート方法
-
-```
-pip install --upgrade --force-reinstall git+https://github.com/kayu0514/VersaLog.py.git
+pip install VersaLog
 ```
 
 ## サンプル
