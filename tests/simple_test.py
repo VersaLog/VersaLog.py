@@ -15,3 +15,27 @@ logger.error("err")
 logger.warning("war")
 logger.debug("deb")
 logger.critical("cri")
+
+# show_tag False
+logger = VersaLog(mode="simple", show_tag=False)
+logger.info("ok")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")
+
+# show_tag True
+logger = VersaLog(mode="simple", show_tag=True, tag="VersaLog")
+logger.info("ok")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")
+
+# all True
+logger = VersaLog(mode="simple", all=True)
+logger.info("ok")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")

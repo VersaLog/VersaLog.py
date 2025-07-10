@@ -1,0 +1,9 @@
+LICENSE
+README.md
+setup.py
+VersaLog/__init__.py
+VersaLog/logger.py
+VersaLog.egg-info/PKG-INFO
+VersaLog.egg-info/SOURCES.txt
+VersaLog.egg-info/dependency_links.txt
+VersaLog.egg-info/top_level.txt
