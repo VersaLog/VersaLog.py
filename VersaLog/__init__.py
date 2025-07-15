@@ -1,7 +1,7 @@
 from .logger import VersaLog
 
 __copyright__ = "Copyright 2025 by Kayu0514"
-__version__ = "1.3.6"
+__version__ = "1.3.7"
 __author__ = "Kayu0514"
 __url__ = "https://github.com/kayu0514"
 

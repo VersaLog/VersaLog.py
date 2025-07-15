@@ -1,3 +1,5 @@
+from typing import Optional
+
 import datetime
 import inspect
 
@@ -22,7 +24,7 @@ class VersaLog:
     
     RESET = "\033[0m"
 
-    def __init__(self, mode: str = "simple", show_file: bool = False, show_tag: bool = False, all: bool = False, tag: str = None):
+    def __init__(self, mode: str= "simple", show_file: bool = False, show_tag: bool = False, all: bool = False, tag: Optional[str]= None):
         """
         mode:
             - "simple" : [+] msg
@@ -59,7 +61,7 @@ class VersaLog:
         lineno = frame.lineno
         return f"{filename}:{lineno}"
     
-    def Log(self, msg: str, type: str, tag: str = None) -> None:
+    def Log(self, msg: str, type: str, tag: Optional[str] = None) -> None:
         colors = self.COLORS.get(type, "")
         types = type.upper()
 
@@ -89,17 +91,17 @@ class VersaLog:
 
         print(formatted)
 
-    def info(self, msg: str, tag: str = None) -> None:
+    def info(self, msg: str, tag: Optional[str] = None) -> None:
         self.Log(msg, "INFO", tag)
 
-    def error(self, msg: str, tag: str = None) -> None:
+    def error(self, msg: str, tag: Optional[str] = None) -> None:
         self.Log(msg, "ERROR", tag)
 
-    def warning(self, msg: str, tag: str = None) -> None:
+    def warning(self, msg: str, tag: Optional[str] = None) -> None:
         self.Log(msg, "WARNING", tag)
 
-    def debug(self, msg: str, tag: str = None) -> None:
+    def debug(self, msg: str, tag: Optional[str] = None) -> None:
         self.Log(msg, "DEBUG", tag)
 
-    def critical(self, msg: str, tag: str = None) -> None:
+    def critical(self, msg: str, tag: Optional[str] = None) -> None:
         self.Log(msg, "CRITICAL", tag)
