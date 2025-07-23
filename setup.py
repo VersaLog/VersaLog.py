@@ -5,7 +5,7 @@ with open("README.md", encoding="utf-8") as f:
 
 setup(
     name="VersaLog",
-    version="1.3.8",
+    version="1.4.2",
     description="Versatile logging library.",
     long_description=long_description,
     long_description_content_type="text/markdown",
