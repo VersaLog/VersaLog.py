@@ -1,9 +1,8 @@
 from typing import Optional
+from plyer import notification
 
 import datetime
 import inspect
-
-valid_modes = ["simple", "detailed", "file"]
 
 class VersaLog:
     COLORS = {
@@ -24,7 +23,9 @@ class VersaLog:
     
     RESET = "\033[0m"
 
-    def __init__(self, mode: str= "simple", show_file: bool = False, show_tag: bool = False, all: bool = False, tag: Optional[str]= None):
+    valid_modes = ["simple", "detailed", "file"]
+
+    def __init__(self, mode: str= "simple", show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, tag: Optional[str]= None):
         """
         mode:
             - "simple" : [+] msg
@@ -36,20 +37,24 @@ class VersaLog:
             - True : Show self.tag if no explicit tag is provided
         tag:
             - Default tag to use when show_tag is enabled
-        all:
-            - Shortcut to enable both show_file and show_tag
+        enable_all:
+            - Shortcut to enable both show_file and show_tag and notice
+        notice:
+            - True : When an error or critical level log is output, a desktop notification (using plyer.notification) will be displayed. The notification includes the log level and message.
         """
-        if all:
+        if enable_all:
             show_file = True
             show_tag  = True
+            notice    = True
 
         self.mode = mode.lower()
         self.show_tag = show_tag
         self.show_file = show_file
+        self.notice = notice
         self.tag = tag
         
-        if self.mode not in valid_modes:
-            raise ValueError(f"Invalid mode '{mode}' specified. Valid modes are: {', '.join(valid_modes)}")
+        if self.mode not in self.valid_modes:
+            raise ValueError(f"Invalid mode '{mode}' specified. Valid modes are: {', '.join(self.valid_modes)}")
         
 
     def GetTime(self) -> str:
@@ -61,14 +66,21 @@ class VersaLog:
         lineno = frame.lineno
         return f"{filename}:{lineno}"
     
-    def Log(self, msg: str, type: str, tag: Optional[str] = None) -> None:
-        colors = self.COLORS.get(type, "")
-        types = type.upper()
+    def Log(self, msg: str, tye: str, tag: Optional[str] = None) -> None:
+        colors = self.COLORS.get(tye, "")
+        types = tye.upper()
 
         final_tag = tag or (self.tag if self.show_tag else None)
         tag_str = final_tag if final_tag else ""
 
         caller = self.GetCaller() if self.show_file or self.mode == "file" else ""
+
+        if self.notice and types in ["ERROR", "CRITICAL"]:
+            notification.notify(
+                title=f"{types} Log notice",
+                message=msg,
+                app_name="VersaLog"
+            )
 
         if self.mode == "simple":
             symbol = self.SYMBOLS.get(type, "[?]")
