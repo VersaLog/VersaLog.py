@@ -23,12 +23,13 @@ class VersaLog:
     
     RESET = "\033[0m"
 
-    valid_modes = ["simple", "detailed", "file"]
+    valid_modes = ["simple", "simple2", "detailed", "file"]
 
     def __init__(self, mode: str= "simple", show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, tag: Optional[str]= None):
         """
         mode:
             - "simple" : [+] msg
+            - "simple2" : [TIME] [+] msg
             - "detailed" : [TIME][LEVEL] : msg
             - "file" : [FILE:LINE][LEVEL] msg
         show_file:
@@ -88,6 +89,14 @@ class VersaLog:
                 formatted = f"[{caller}][{tag_str}]{colors}{symbol}{self.RESET} {msg}"
             else:
                 formatted = f"{colors}{symbol}{self.RESET} {msg}"
+
+        elif self.mode == "simple2":
+            symbol = self.SYMBOLS.get(type, "[?]")
+            time = self.GetTime()
+            if self.show_file:
+                formatted = f"[{time}] [{caller}][{tag_str}]{colors}{symbol}{self.RESET} {msg}"
+            else:
+                formatted = f"[{time}] {colors}{symbol}{self.RESET} {msg}"
 
         elif self.mode == "file":
             formatted = f"[{caller}]{colors}[{types}]{self.RESET} {msg}"
