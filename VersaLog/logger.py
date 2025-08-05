@@ -87,7 +87,7 @@ class VersaLog:
     def save_log(self, log_text: str, level: str) -> None:
         if level not in self.save_levels:
             return
-        log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'log')
+        log_dir = os.path.join(os.getcwd(), 'log')
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
         log_file = os.path.join(log_dir, datetime.datetime.now().strftime('%Y-%m-%d') + '.log')
