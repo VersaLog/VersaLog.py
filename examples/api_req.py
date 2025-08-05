@@ -1,7 +1,7 @@
 from VersaLog import *
 import requests
 
-logger = VersaLog(mode="detailed", show_file=False, show_tag=True, all=False, tag="Request")
+logger = VersaLog(mode="detailed", show_tag=True, tag="Request")
 
 def main():
     api = "http://api.openweathermap.org/data/2.5/weather"
