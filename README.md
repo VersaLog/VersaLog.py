@@ -21,13 +21,21 @@ pip install VersaLog
 
 ### Options
 
-| Options      | Description                                                                                                                                                                     |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `show_file`  | True : Display filename and line number (for simple and detailed modes)                                                                                                         |
-| `show_tag`   | True : Show self.tag if no explicit tag is provided                                                                                                                             |
-| `tag`        | Default tag to use when show_tag is enabled                                                                                                                                     |
-| `enable_all` | Shortcut to enable both show_file and show_tag                                                                                                                                  |
-| `notice`     | True : When an error or critical level log is output, a desktop notification (using plyer.notification) will be displayed. The notification includes the log level and message. |
+| Options       | Description                                                                                                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `show_file`   | True : Display filename and line number (for simple and detailed modes)                                                                                                         |
+| `show_tag`    | True : Show self.tag if no explicit tag is provided                                                                                                                             |
+| `tag`         | Default tag to use when show_tag is enabled                                                                                                                                     |
+| `enable_all`  | Shortcut to enable both show_file and show_tag                                                                                                                                  |
+| `notice`      | True : When an error or critical level log is output, a desktop notification (using plyer.notification) will be displayed. The notification includes the log level and message. |
+| `all_save`    | True : When an error or critical level log is output, the log will be saved to a file.                                                                                          |
+| `save_levels` | A list of log levels to save. Defaults to ["INFO", "ERROR", "WARNING", "DEBUG", "CRITICAL"].                                                                                    |
+
+## Log save
+
+```
+[2025-08-06 04:10:36][INFO] : ok
+```
 
 ## Sample
 
