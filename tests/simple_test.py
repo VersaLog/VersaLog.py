@@ -48,6 +48,22 @@ logger.warning("war")
 logger.debug("deb")
 logger.critical("cri")
 
+# silent False
+logger = VersaLog(mode="simple", all_save=True, silent=False)
+logger.info("ok")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")
+
+# silent True
+logger = VersaLog(mode="simple", all_save=True, silent=True)
+logger.info("ok")
+logger.error("err")
+logger.warning("war")
+logger.debug("deb")
+logger.critical("cri")
+
 # enable_all True
 logger = VersaLog(mode="simple", tag="VersaLog",enable_all=True)
 logger.info("ok")

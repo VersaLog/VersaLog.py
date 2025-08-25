@@ -4,6 +4,10 @@ from plyer import notification
 import datetime
 import inspect
 import os
+import sys
+import queue
+import threading
+import traceback
 
 class VersaLog:
     COLORS = {
@@ -27,7 +31,7 @@ class VersaLog:
     valid_modes = ["simple", "simple2", "detailed", "file"]
     valid_save_levels = ["INFO", "ERROR", "WARNING", "DEBUG", "CRITICAL"]
 
-    def __init__(self, mode: str= "simple", tag: Optional[str]= None, show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, all_save: bool = False, save_levels: Optional[list]=None):
+    def __init__(self, mode: str= "simple", tag: Optional[str]= None, show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, all_save: bool = False, save_levels: Optional[list]=None, silent: bool = False, catch_exceptions: bool = False):
         """
         mode:
             - "simple" : [+] msg
@@ -47,7 +51,11 @@ class VersaLog:
         all_save:
             - True : When an error or critical level log is output, the log will be saved to a file.
         save_levels:
-            - A list of log levels to save. Defaults to ["INFO", "ERROR", "WARNING", "DEBUG", "CRITICAL"].
+            - A list of log levels to save. Defaults to ["INFO", "ERROR", "WARNING", "DEBUG", "CRITICAL"]
+        silent:
+            - True : Suppress standard output (print)
+        catch_exceptions:
+            - True : Automatically catch unhandled exceptions and log them as critical
         """
         if enable_all:
             show_file = True
@@ -62,6 +70,11 @@ class VersaLog:
         self.tag = tag
         self.all_save = all_save
         self.save_levels = save_levels
+        self.silent = silent
+
+        self.log_queue = queue.Queue()
+        self.worker_thread = threading.Thread(target=self._worker, daemon=True)
+        self.worker_thread.start()
         
         if self.mode not in self.valid_modes:
             raise ValueError(f"Invalid mode '{mode}' specified. Valid modes are: {', '.join(self.valid_modes)}")
@@ -73,18 +86,43 @@ class VersaLog:
                 raise ValueError(f"save_levels must be a list. Example: ['ERROR']")
             elif not all(level in self.valid_save_levels for level in self.save_levels):
                 raise ValueError(f"Invalid save_levels specified. Valid levels are: {', '.join(self.valid_save_levels)}")
+            
+        if catch_exceptions:
+            sys.excepthook = self._handle_exception
 
+    def _handle_exception(self, exc_type, exc_value, exc_traceback):
+        tb_str = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        self.critical(f"Unhandled exception:\n{tb_str}")
 
-    def GetTime(self) -> str:
+    def _worker(self):
+        while True:
+            log_text, level = self.log_queue.get()
+            if log_text is None:
+                break
+            self._save_log_sync(log_text, level)
+            self.log_queue.task_done()
+
+    def _GetTime(self) -> str:
         return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
-    def GetCaller(self) -> str:
+    def _GetCaller(self) -> str:
         frame = inspect.stack()[3]
         filename = frame.filename.split("/")[-1]
         lineno = frame.lineno
         return f"{filename}:{lineno}"
     
-    def save_log(self, log_text: str, level: str) -> None:
+    def _save_log_sync(self, log_text: str, level: str) -> None:
+        if not self.all_save:
+            return
+        if level not in self.save_levels:
+            return
+        log_dir = os.path.join(os.getcwd(), 'log')
+        os.makedirs(log_dir, exist_ok=True)
+        log_file = os.path.join(log_dir, datetime.datetime.now().strftime('%Y-%m-%d') + '.log')
+        with open(log_file, 'a', encoding='utf-8') as f:
+            f.write(log_text + '\n')
+    
+    def _save_log(self, log_text: str, level: str) -> None:
         if level not in self.save_levels:
             return
         log_dir = os.path.join(os.getcwd(), 'log')
@@ -94,14 +132,14 @@ class VersaLog:
         with open(log_file, 'a', encoding='utf-8') as f:
             f.write(log_text + '\n')
 
-    def Log(self, msg: str, tye: str, tag: Optional[str] = None) -> None:
+    def _Log(self, msg: str, tye: str, tag: Optional[str] = None) -> None:
         colors = self.COLORS.get(tye, "")
         types = tye.upper()
 
         final_tag = tag or (self.tag if self.show_tag else None)
         tag_str = final_tag if final_tag else ""
 
-        caller = self.GetCaller() if self.show_file or self.mode == "file" else ""
+        caller = self._GetCaller() if self.show_file or self.mode == "file" else ""
 
         if self.notice and types in ["ERROR", "CRITICAL"]:
             notification.notify(
@@ -121,7 +159,7 @@ class VersaLog:
 
         elif self.mode == "simple2":
             symbol = self.SYMBOLS.get(tye, "[?]")
-            time = self.GetTime()
+            time = self._GetTime()
             if self.show_file:
                 formatted = f"[{time}] [{caller}][{tag_str}]{colors}{symbol}{self.RESET} {msg}"
                 plain = f"[{time}] [{caller}][{tag_str}]{symbol} {msg}"
@@ -134,7 +172,7 @@ class VersaLog:
             plain = f"[{caller}][{types}] {msg}"
 
         else:
-            time = self.GetTime()
+            time = self._GetTime()
             formatted = f"[{time}]{colors}[{types}]{self.RESET}"
             plain = f"[{time}][{types}]"
             if final_tag:
@@ -146,20 +184,22 @@ class VersaLog:
             formatted += f" : {msg}"
             plain += f" : {msg}"
 
-        print(formatted)
-        self.save_log(plain, types)
+        if not self.silent:
+            print(formatted)
+
+        self._save_log(plain, types)
 
     def info(self, msg: str, tag: Optional[str] = None) -> None:
-        self.Log(msg, "INFO", tag)
+        self._Log(msg, "INFO", tag)
 
     def error(self, msg: str, tag: Optional[str] = None) -> None:
-        self.Log(msg, "ERROR", tag)
+        self._Log(msg, "ERROR", tag)
 
     def warning(self, msg: str, tag: Optional[str] = None) -> None:
-        self.Log(msg, "WARNING", tag)
+        self._Log(msg, "WARNING", tag)
 
     def debug(self, msg: str, tag: Optional[str] = None) -> None:
-        self.Log(msg, "DEBUG", tag)
+        self._Log(msg, "DEBUG", tag)
 
     def critical(self, msg: str, tag: Optional[str] = None) -> None:
-        self.Log(msg, "CRITICAL", tag)
+        self._Log(msg, "CRITICAL", tag)
