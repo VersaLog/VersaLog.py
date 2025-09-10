@@ -5,6 +5,7 @@ import datetime
 import inspect
 import os
 import sys
+import time
 import queue
 import threading
 import traceback
@@ -75,6 +76,8 @@ class VersaLog:
         self.log_queue = queue.Queue()
         self.worker_thread = threading.Thread(target=self._worker, daemon=True)
         self.worker_thread.start()
+
+        self._last_cleanup_date = None
         
         if self.mode not in self.valid_modes:
             raise ValueError(f"Invalid mode '{mode}' specified. Valid modes are: {', '.join(self.valid_modes)}")
@@ -110,6 +113,31 @@ class VersaLog:
         filename = frame.filename.split("/")[-1]
         lineno = frame.lineno
         return f"{filename}:{lineno}"
+
+    def _cleanup_old_logs(self, days: int = 7) -> None:
+        log_dir = os.path.join(os.getcwd(), 'log')
+        if not os.path.exists(log_dir):
+            return
+
+        now = datetime.datetime.now()
+        for filename in os.listdir(log_dir):
+            if not filename.endswith(".log"):
+                continue
+            filepath = os.path.join(log_dir, filename)
+
+            try:
+                file_date = datetime.datetime.strptime(filename.replace(".log", ""), "%Y-%m-%d")
+            except ValueError:
+                file_date = datetime.datetime.fromtimestamp(os.path.getmtime(filepath))
+
+            if (now - file_date).days >= days:
+                try:
+                    os.remove(filepath)
+                    if not self.silent:
+                        self.info(f"[LOG CLEANUP] removed: {filepath}")
+                except Exception as e:
+                    if not self.silent:
+                        self.warning(f"[LOG CLEANUP WARNING] {filepath} cannot be removed: {e}")
     
     def _save_log_sync(self, log_text: str, level: str) -> None:
         if not self.all_save:
@@ -121,6 +149,11 @@ class VersaLog:
         log_file = os.path.join(log_dir, datetime.datetime.now().strftime('%Y-%m-%d') + '.log')
         with open(log_file, 'a', encoding='utf-8') as f:
             f.write(log_text + '\n')
+
+        today = datetime.date.today()
+        if self._last_cleanup_date != today:
+            self._cleanup_old_logs(days=7)
+            self._last_cleanup_date = today
     
     def _save_log(self, log_text: str, level: str) -> None:
         if level not in self.save_levels:
