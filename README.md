@@ -1,4 +1,7 @@
 ## What is VersaLog.py?
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 What is VersaLog.py?
 VersaLog is a powerful and flexible logging library for Python.
@@ -44,3 +47,25 @@ pip install VersaLog
 **Simple** : [Tap](https://github.com/kayu0514/VersaLog.py/blob/main/tests/simple_test.py)  
 **Detailed** : [Tap](https://github.com/kayu0514/VersaLog.py/blob/main/tests/detailed_test.py)
 **File** : [Tap](https://github.com/kayu0514/VersaLog.py/blob/main/tests/file_test.py)
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kaedeek"><img src="https://avatars.githubusercontent.com/u/170544738?v=4?s=100" width="100px;" alt="ₖₐₑ𝒹ₑ"/><br /><sub><b>ₖₐₑ𝒹ₑ</b></sub></a><br /><a href="https://github.com/kayu0514/VersaLog.py/commits?author=kaedeek" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
