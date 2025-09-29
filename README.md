@@ -1,7 +1,12 @@
 ## What is VersaLog.py?
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+[![PyPI downloads](https://img.shields.io/pypi/dm/VersaLog.svg?style=flat-square)](https://pypi.org/project/VersaLog/)
 
 What is VersaLog.py?
 VersaLog is a powerful and flexible logging library for Python.
@@ -41,12 +46,6 @@ pip install VersaLog
 ```
 [2025-08-06 04:10:36][INFO] : ok
 ```
-
-## Sample
-
-**Simple** : [Tap](https://github.com/kayu0514/VersaLog.py/blob/main/tests/simple_test.py)  
-**Detailed** : [Tap](https://github.com/kayu0514/VersaLog.py/blob/main/tests/detailed_test.py)
-**File** : [Tap](https://github.com/kayu0514/VersaLog.py/blob/main/tests/file_test.py)
 
 ## Contributors ✨
 
