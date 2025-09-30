@@ -1,6 +1,6 @@
 from VersaLog import *
 
-logger = VersaLog(mode="file")
+logger = VersaLog(enum="file")
 logger.info("ok")
 logger.error("err")
 logger.warning("war")

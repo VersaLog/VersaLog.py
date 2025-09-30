@@ -32,15 +32,15 @@ class VersaLog:
     valid_modes = ["simple", "simple2", "detailed", "file"]
     valid_save_levels = ["INFO", "ERROR", "WARNING", "DEBUG", "CRITICAL"]
 
-    def __init__(self, mode: str= "simple", tag: Optional[str]= None, show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, all_save: bool = False, save_levels: Optional[list]=None, silent: bool = False, catch_exceptions: bool = False):
+    def __init__(self, enum: str= "simple", tag: Optional[str]= None, show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, all_save: bool = False, save_levels: Optional[list]=None, silent: bool = False, catch_exceptions: bool = False):
         """
-        mode:
+        enum:
             - "simple" : [+] msg
             - "simple2" : [TIME] [+] msg
             - "detailed" : [TIME][LEVEL] : msg
             - "file" : [FILE:LINE][LEVEL] msg
         show_file:
-            - True : Display filename and line number (for simple and detailed modes)
+            - True : Display filename and line number (for simple and detailed enum)
         show_tag:
             - True : Show self.tag if no explicit tag is provided
         tag:
@@ -64,7 +64,7 @@ class VersaLog:
             notice    = True
             all_save  = True
 
-        self.mode = mode.lower()
+        self.enum = enum.lower()
         self.show_tag = show_tag
         self.show_file = show_file
         self.notice = notice
@@ -79,8 +79,8 @@ class VersaLog:
 
         self._last_cleanup_date = None
         
-        if self.mode not in self.valid_modes:
-            raise ValueError(f"Invalid mode '{mode}' specified. Valid modes are: {', '.join(self.valid_modes)}")
+        if self.enum not in self.valid_modes:
+            raise ValueError(f"Invalid enum '{enum}' specified. Valid modes are: {', '.join(self.valid_modes)}")
         
         if self.all_save:
             if self.save_levels is None:
@@ -172,7 +172,7 @@ class VersaLog:
         final_tag = tag or (self.tag if self.show_tag else None)
         tag_str = final_tag if final_tag else ""
 
-        caller = self._GetCaller() if self.show_file or self.mode == "file" else ""
+        caller = self._GetCaller() if self.show_file or self.enum == "file" else ""
 
         if self.notice and types in ["ERROR", "CRITICAL"]:
             notification.notify(
@@ -181,7 +181,7 @@ class VersaLog:
                 app_name="VersaLog"
             )
 
-        if self.mode == "simple":
+        if self.enum == "simple":
             symbol = self.SYMBOLS.get(tye, "[?]")
             if self.show_file:
                 formatted = f"[{caller}][{tag_str}]{colors}{symbol}{self.RESET} {msg}"
@@ -190,7 +190,7 @@ class VersaLog:
                 formatted = f"{colors}{symbol}{self.RESET} {msg}"
                 plain = f"{symbol} {msg}"
 
-        elif self.mode == "simple2":
+        elif self.enum == "simple2":
             symbol = self.SYMBOLS.get(tye, "[?]")
             time = self._GetTime()
             if self.show_file:
@@ -200,7 +200,7 @@ class VersaLog:
                 formatted = f"[{time}] {colors}{symbol}{self.RESET} {msg}"
                 plain = f"[{time}] {symbol} {msg}"
 
-        elif self.mode == "file":
+        elif self.enum == "file":
             formatted = f"[{caller}]{colors}[{types}]{self.RESET} {msg}"
             plain = f"[{caller}][{types}] {msg}"
 
