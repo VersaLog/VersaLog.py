@@ -6,11 +6,21 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![PyPI downloads](https://img.shields.io/pypi/dm/VersaLog.svg?style=flat-square)](https://pypi.org/project/VersaLog/)
+[![PyPI version](https://badge.fury.io/py/VersaLog.svg)](https://badge.fury.io/py/VersaLog)
+[![Downloads](https://pepy.tech/badge/VersaLog)](https://pepy.tech/project/VersaLog)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Discord](https://img.shields.io/badge/Discord-Support%20Server-7289DA?style=flat&logo=discord)](https://discord.gg/MaWeRFxa)
 
 What is VersaLog.py?
 VersaLog is a powerful and flexible logging library for Python.
 It supports everything from simple usage to advanced, highly customizable configurations to meet a wide range of needs.
+
+## Support
+
+Join our Discord server for support, questions, and community discussions:
+
+[![Discord](https://img.shields.io/badge/Discord-Support%20Server-7289DA?style=flat&logo=discord)](https://discord.gg/MaWeRFxa)
 
 ## Installation
 
