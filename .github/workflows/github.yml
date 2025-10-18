@@ -1,50 +1,39 @@
-name: Discord Pull Request Notification
+name: Discord Notification
 
 on:
+  issues:
+    types: [opened, closed, reopened]
   pull_request:
-    types: [opened, closed, reopened, assigned, review_requested]
+    types: [opened, closed, reopened]
 
 jobs:
-  send_notification:
+  notify:
     runs-on: ubuntu-latest
     steps:
-      - name: Send Discord Notification
+      - name: Send message to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          ACTION: ${{ github.event.action }}
+          ACTOR: ${{ github.actor }}
+          TITLE: ${{ github.event.pull_request.title || github.event.issue.title }}
+          NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+          URL: ${{ github.event.pull_request.html_url || github.event.issue.html_url }}
         run: |
-          EVENT="${{ github.event.action }}"
-          PR_NUMBER="${{ github.event.pull_request.number }}"
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          PR_URL="${{ github.event.pull_request.html_url }}"
-          USER="${{ github.actor }}"
+          set -e
+          echo "Sending message to Discord..."
 
-          MESSAGE=""
+          DISCORD_WEBHOOK=$(echo "$DISCORD_WEBHOOK" | tr -d '\r\n ')
 
-          case "$EVENT" in
-            opened)
-              MESSAGE="📢 Pull Request #${PR_NUMBER} has been created! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
-              ;;
-            closed)
-              if ${{ github.event.pull_request.merged }}; then
-                MESSAGE="🎉 Pull Request #${PR_NUMBER} has been merged! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
-              else
-                MESSAGE="❌ Pull Request #${PR_NUMBER} has been closed! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
-              fi
-              ;;
-            reopened)
-              MESSAGE="🔄 Pull Request #${PR_NUMBER} has been reopened! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
-              ;;
-            assigned)
-              MESSAGE="🙋 Pull Request #${PR_NUMBER} has been assigned to $USER!\nTitle: $PR_TITLE\nURL: $PR_URL"
-              ;;
-            review_requested)
-              REVIEWER="${{ github.event.requested_reviewers.*.login }}"
-              MESSAGE="👀 Review for Pull Request #${PR_NUMBER} has been requested from $REVIEWER! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
-              ;;
-            *)
-              MESSAGE="Unknown pull request event: $EVENT"
-              ;;
-          esac
+          if [ "$GITHUB_EVENT_NAME" = "issues" ]; then
+            CONTENT="📢 Issue #$NUMBER $ACTION by $ACTOR\n**$TITLE**\n$URL"
+          elif [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            CONTENT="📢 Pull Request #$NUMBER $ACTION by $ACTOR\n**$TITLE**\n$URL"
+          else
+            CONTENT="🔔 Unknown event triggered by $ACTOR"
+          fi
 
-          curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"content\": \"$MESSAGE\"}" \
-            ${{ secrets.DISCORD_WEBHOOK }}
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"$CONTENT\"}" \
+               "$DISCORD_WEBHOOK"
