@@ -1,0 +1,50 @@
+name: Discord Pull Request Notification
+
+on:
+  pull_request:
+    types: [opened, closed, reopened, assigned, review_requested]
+
+jobs:
+  send_notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        run: |
+          EVENT="${{ github.event.action }}"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          USER="${{ github.actor }}"
+
+          MESSAGE=""
+
+          case "$EVENT" in
+            opened)
+              MESSAGE="📢 Pull Request #${PR_NUMBER} has been created! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
+              ;;
+            closed)
+              if ${{ github.event.pull_request.merged }}; then
+                MESSAGE="🎉 Pull Request #${PR_NUMBER} has been merged! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
+              else
+                MESSAGE="❌ Pull Request #${PR_NUMBER} has been closed! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
+              fi
+              ;;
+            reopened)
+              MESSAGE="🔄 Pull Request #${PR_NUMBER} has been reopened! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
+              ;;
+            assigned)
+              MESSAGE="🙋 Pull Request #${PR_NUMBER} has been assigned to $USER!\nTitle: $PR_TITLE\nURL: $PR_URL"
+              ;;
+            review_requested)
+              REVIEWER="${{ github.event.requested_reviewers.*.login }}"
+              MESSAGE="👀 Review for Pull Request #${PR_NUMBER} has been requested from $REVIEWER! by $USER\nTitle: $PR_TITLE\nURL: $PR_URL"
+              ;;
+            *)
+              MESSAGE="Unknown pull request event: $EVENT"
+              ;;
+          esac
+
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"$MESSAGE\"}" \
+            ${{ secrets.DISCORD_WEBHOOK }}
