@@ -18,8 +18,8 @@ jobs:
           set -e
           echo "Preparing to send message to Discord..."
 
-          # Remove line breaks and spaces (to prevent curl errors)
-          DISCORD_WEBHOOK=$(echo "$DISCORD_WEBHOOK" | tr -d '\r\n[:space:]')
+          DISCORD_WEBHOOK=$(echo "$DISCORD_WEBHOOK" | tr -d '\r\n[:space:]' | xargs)
+          echo "Webhook head => ${DISCORD_WEBHOOK:0:40}..."
 
           EVENT="${{ github.event.action }}"
           USER="${{ github.actor }}"
@@ -37,24 +37,24 @@ jobs:
 
             case "$EVENT" in
               opened)
-                MESSAGE="📢 **Pull Request #${PR_NUMBER}** has been created!\n👤 Author: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 URL: ${PR_URL}"
+                MESSAGE="📢 **Pull Request #${PR_NUMBER}** has been created!\n👤 Author: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 ${PR_URL}"
                 ;;
               closed)
                 if [ "$PR_MERGED" = "true" ]; then
-                  MESSAGE="🎉 **Pull Request #${PR_NUMBER}** has been merged!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 URL: ${PR_URL}"
+                  MESSAGE="🎉 **Pull Request #${PR_NUMBER}** has been merged!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 ${PR_URL}"
                 else
-                  MESSAGE="❌ **Pull Request #${PR_NUMBER}** has been closed!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 URL: ${PR_URL}"
+                  MESSAGE="❌ **Pull Request #${PR_NUMBER}** has been closed!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 ${PR_URL}"
                 fi
                 ;;
               reopened)
-                MESSAGE="🔄 **Pull Request #${PR_NUMBER}** has been reopened!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 URL: ${PR_URL}"
+                MESSAGE="🔄 **Pull Request #${PR_NUMBER}** has been reopened!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 ${PR_URL}"
                 ;;
               assigned)
-                MESSAGE="🙋 **Pull Request #${PR_NUMBER}** has been assigned to ${USER}!\n📄 Title: ${PR_TITLE}\n🔗 URL: ${PR_URL}"
+                MESSAGE="🙋 **Pull Request #${PR_NUMBER}** has been assigned to ${USER}!\n📄 Title: ${PR_TITLE}\n🔗 ${PR_URL}"
                 ;;
               review_requested)
                 REVIEWER="${{ github.event.requested_reviewer.login }}"
-                MESSAGE="👀 **Pull Request #${PR_NUMBER}** review has been requested from ${REVIEWER}!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 URL: ${PR_URL}"
+                MESSAGE="👀 **Pull Request #${PR_NUMBER}** review has been requested from ${REVIEWER}!\n👤 By: ${USER}\n📄 Title: ${PR_TITLE}\n🔗 ${PR_URL}"
                 ;;
               *)
                 MESSAGE="❓ Unknown Pull Request event: ${EVENT}"
@@ -68,30 +68,31 @@ jobs:
 
             case "$EVENT" in
               opened)
-                MESSAGE="🐛 **Issue #${ISSUE_NUMBER}** has been created!\n👤 Author: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 URL: ${ISSUE_URL}"
+                MESSAGE="🐛 **Issue #${ISSUE_NUMBER}** has been created!\n👤 Author: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 ${ISSUE_URL}"
                 ;;
               closed)
-                MESSAGE="✅ **Issue #${ISSUE_NUMBER}** has been closed!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 URL: ${ISSUE_URL}"
+                MESSAGE="✅ **Issue #${ISSUE_NUMBER}** has been closed!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 ${ISSUE_URL}"
                 ;;
               reopened)
-                MESSAGE="🔄 **Issue #${ISSUE_NUMBER}** has been reopened!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 URL: ${ISSUE_URL}"
+                MESSAGE="🔄 **Issue #${ISSUE_NUMBER}** has been reopened!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 ${ISSUE_URL}"
                 ;;
               assigned)
                 ASSIGNEE="${{ github.event.assignee.login }}"
-                MESSAGE="🙋 **Issue #${ISSUE_NUMBER}** has been assigned to ${ASSIGNEE}!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 URL: ${ISSUE_URL}"
+                MESSAGE="🙋 **Issue #${ISSUE_NUMBER}** has been assigned to ${ASSIGNEE}!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 ${ISSUE_URL}"
                 ;;
               labeled)
                 LABEL="${{ github.event.label.name }}"
-                MESSAGE="🏷️ **Issue #${ISSUE_NUMBER}** has been labeled with '${LABEL}'!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 URL: ${ISSUE_URL}"
+                MESSAGE="🏷️ **Issue #${ISSUE_NUMBER}** has been labeled with '${LABEL}'!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 ${ISSUE_URL}"
                 ;;
               unlabeled)
                 LABEL="${{ github.event.label.name }}"
-                MESSAGE="🏷️ **Issue #${ISSUE_NUMBER}** label '${LABEL}' has been removed!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 URL: ${ISSUE_URL}"
+                MESSAGE="🏷️ **Issue #${ISSUE_NUMBER}** label '${LABEL}' has been removed!\n👤 By: ${USER}\n📄 Title: ${ISSUE_TITLE}\n🔗 ${ISSUE_URL}"
                 ;;
               *)
                 MESSAGE="❓ Unknown Issue event: ${EVENT}"
                 ;;
             esac
+
           else
             MESSAGE="❓ Unknown event type: ${EVENT_NAME}"
           fi
@@ -101,7 +102,6 @@ jobs:
           echo "$MESSAGE"
           echo "--------------------------------"
 
-          # Send to Discord
           curl -X POST \
             -H "Content-Type: application/json" \
             -d "{\"content\": \"$MESSAGE\"}" \
