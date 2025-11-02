@@ -156,6 +156,8 @@ class VersaLog:
             self._last_cleanup_date = today
     
     def _save_log(self, log_text: str, level: str) -> None:
+        if not self.all_save:
+            return
         if level not in self.save_levels:
             return
         log_dir = os.path.join(os.getcwd(), 'log')
