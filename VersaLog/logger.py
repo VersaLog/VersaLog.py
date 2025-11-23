@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union, List
 from plyer import notification
 
 import datetime
@@ -32,7 +32,7 @@ class VersaLog:
     valid_modes = ["simple", "simple2", "detailed", "file"]
     valid_save_levels = ["INFO", "ERROR", "WARNING", "DEBUG", "CRITICAL"]
 
-    def __init__(self, enum: str= "simple", tag: Optional[str]= None, show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, all_save: bool = False, save_levels: Optional[list]=None, silent: bool = False, catch_exceptions: bool = False):
+    def __init__(self, enum: str= "simple", tag: Optional[Union[str, List[str]]]= None, show_file: bool = False, show_tag: bool = False, enable_all: bool = False, notice: bool = False, all_save: bool = False, save_levels: Optional[list]=None, silent: bool = False, catch_exceptions: bool = False):
         """
         enum:
             - "simple" : [+] msg
@@ -44,7 +44,7 @@ class VersaLog:
         show_tag:
             - True : Show self.tag if no explicit tag is provided
         tag:
-            - Default tag to use when show_tag is enabled
+            - Default tag to use when show_tag is enabled (str or list[str])
         enable_all:
             - Shortcut to enable both show_file and show_tag and notice
         notice:
@@ -68,7 +68,7 @@ class VersaLog:
         self.show_tag = show_tag
         self.show_file = show_file
         self.notice = notice
-        self.tag = tag
+        self.tag = tag if (tag is None or isinstance(tag, list)) else [tag] if isinstance(tag, str) and ',' in tag else tag
         self.all_save = all_save
         self.save_levels = save_levels
         self.silent = silent
@@ -167,52 +167,48 @@ class VersaLog:
         with open(log_file, 'a', encoding='utf-8') as f:
             f.write(log_text + '\n')
 
-    def _Log(self, msg: str, tye: str, tag: Optional[str] = None) -> None:
+    def _Log(self, msg: str, tye: str, tag: Optional[Union[str, List[str]]] = None) -> None:
         colors = self.COLORS.get(tye, "")
         types = tye.upper()
 
-        final_tag = tag or (self.tag if self.show_tag else None)
-        tag_str = final_tag if final_tag else ""
+        final_tag = tag if tag is not None else (self.tag if self.show_tag else None)
+        if isinstance(final_tag, list):
+            tags = [str(t) for t in final_tag if t]
+        elif isinstance(final_tag, str):
+            tags = [final_tag] if final_tag else []
+        else:
+            tags = []
+        tag_str = "".join(f"[{t}]" for t in tags) if tags else ""
 
         caller = self._GetCaller() if self.show_file or self.enum == "file" else ""
-
-        if self.notice and types in ["ERROR", "CRITICAL"]:
-            notification.notify(
-                title=f"{types} Log notice",
-                message=msg,
-                app_name="VersaLog"
-            )
 
         if self.enum == "simple":
             symbol = self.SYMBOLS.get(tye, "[?]")
             if self.show_file:
-                formatted = f"[{caller}][{tag_str}]{colors}{symbol}{self.RESET} {msg}"
-                plain = f"[{caller}][{tag_str}]{symbol} {msg}"
+                formatted = f"[{caller}]{tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"[{caller}]{colors}{symbol}{self.RESET} {msg}"
+                plain = f"[{caller}]{tag_str}{symbol} {msg}" if tag_str else f"[{caller}]{symbol} {msg}"
             else:
-                formatted = f"{colors}{symbol}{self.RESET} {msg}"
-                plain = f"{symbol} {msg}"
+                formatted = f"{tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"{colors}{symbol}{self.RESET} {msg}"
+                plain = f"{tag_str}{symbol} {msg}" if tag_str else f"{symbol} {msg}"
 
         elif self.enum == "simple2":
             symbol = self.SYMBOLS.get(tye, "[?]")
             time = self._GetTime()
             if self.show_file:
-                formatted = f"[{time}] [{caller}][{tag_str}]{colors}{symbol}{self.RESET} {msg}"
-                plain = f"[{time}] [{caller}][{tag_str}]{symbol} {msg}"
+                formatted = f"[{time}] [{caller}]{tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"[{time}] [{caller}]{colors}{symbol}{self.RESET} {msg}"
+                plain = f"[{time}] [{caller}]{tag_str}{symbol} {msg}" if tag_str else f"[{time}] [{caller}]{symbol} {msg}"
             else:
-                formatted = f"[{time}] {colors}{symbol}{self.RESET} {msg}"
-                plain = f"[{time}] {symbol} {msg}"
+                formatted = f"[{time}] {tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"[{time}] {colors}{symbol}{self.RESET} {msg}"
+                plain = f"[{time}] {tag_str}{symbol} {msg}" if tag_str else f"[{time}] {symbol} {msg}"
 
         elif self.enum == "file":
-            formatted = f"[{caller}]{colors}[{types}]{self.RESET} {msg}"
-            plain = f"[{caller}][{types}] {msg}"
+            formatted = f"[{caller}]{tag_str}{colors}[{types}]{self.RESET} {msg}" if tag_str else f"[{caller}]{colors}[{types}]{self.RESET} {msg}"
+            plain = f"[{caller}]{tag_str}[{types}] {msg}" if tag_str else f"[{caller}][{types}] {msg}"
 
-        else:
+        else:  # detailed
             time = self._GetTime()
-            formatted = f"[{time}]{colors}[{types}]{self.RESET}"
-            plain = f"[{time}][{types}]"
-            if final_tag:
-                formatted += f"[{final_tag}]"
-                plain += f"[{final_tag}]"
+            formatted = f"[{time}]{colors}[{types}]{self.RESET}{tag_str}" if tag_str else f"[{time}]{colors}[{types}]{self.RESET}"
+            plain = f"[{time}][{types}]{tag_str}" if tag_str else f"[{time}][{types}]"
             if self.show_file:
                 formatted += f"[{caller}]"
                 plain += f"[{caller}]"
@@ -224,17 +220,20 @@ class VersaLog:
 
         self._save_log(plain, types)
 
-    def info(self, msg: str, tag: Optional[str] = None) -> None:
+    def info(self, msg: str, tag: Optional[Union[str, List[str]]] = None) -> None:
         self._Log(msg, "INFO", tag)
 
-    def error(self, msg: str, tag: Optional[str] = None) -> None:
+    def error(self, msg: str, tag: Optional[Union[str, List[str]]] = None) -> None:
         self._Log(msg, "ERROR", tag)
 
-    def warning(self, msg: str, tag: Optional[str] = None) -> None:
+    def warning(self, msg: str, tag: Optional[Union[str, List[str]]] = None) -> None:
         self._Log(msg, "WARNING", tag)
 
-    def debug(self, msg: str, tag: Optional[str] = None) -> None:
+    def debug(self, msg: str, tag: Optional[Union[str, List[str]]] = None) -> None:
         self._Log(msg, "DEBUG", tag)
 
-    def critical(self, msg: str, tag: Optional[str] = None) -> None:
+    def critical(self, msg: str, tag: Optional[Union[str, List[str]]] = None) -> None:
         self._Log(msg, "CRITICAL", tag)
+
+    def board(self):
+        print("=" * 45)
