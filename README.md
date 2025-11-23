@@ -51,10 +51,23 @@ pip install VersaLog
 | `silent`           | True : Suppress standard output (print)                                                                                                                                         |
 | `catch_exceptions` | True : Automatically catch unhandled exceptions and log them as critical                                                                                                        |
 
+## Tag set
+
+````python
+
+# one tag
+logger = VersaLog(enum="detailed", tag="a", show_tag=True)
+
+# two tag
+logger = VersaLog(enum="detailed", tag=["a", "a"], show_tag=True)
+```                                                                                                    |
+
 ## Log save
 
-```
+````
+
 [2025-08-06 04:10:36][INFO] : ok
+
 ```
 
 ## Contributors ✨
@@ -78,3 +91,4 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+```
