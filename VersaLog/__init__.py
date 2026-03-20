@@ -1,4 +1,4 @@
-from .logger import VersaLog
+from .core import VersaLog
 
 __copyright__ = "Copyright 2025 by Kayu0514"
 __version__ = "2.0.0"
