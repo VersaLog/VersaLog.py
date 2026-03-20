@@ -12,7 +12,7 @@ def setup_fastapi_logging(versalog):
     root = logging.getLogger()
     root.handlers.clear()
     root.addHandler(handler)
-    root.setLevel(logging.DEBUG)
+    root.setLevel(logging.NOTSET)
 
     for name in ["uvicorn", "uvicorn.error", "uvicorn.access"]:
         logger = logging.getLogger(name)
