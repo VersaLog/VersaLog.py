@@ -1,4 +1,5 @@
 from .core import VersaLog
+from .integrations.fastapi import setup_fastapi_logging
 
 __copyright__ = "Copyright 2025 by Kayu0514"
 __version__ = "2.0.0"
