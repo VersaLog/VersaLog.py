@@ -6,4 +6,4 @@ __version__ = "2.5.1"
 __author__ = "Kayu0514"
 __url__ = "https://github.com/kayu0514"
 
-__all__ = ["VersaLog"]
+__all__ = ["VersaLog", "setup_fastapi_logging"]
