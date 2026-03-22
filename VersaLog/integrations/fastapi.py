@@ -10,11 +10,24 @@ def setup_fastapi_logging(versalog):
     )
 
     root = logging.getLogger()
-    root.handlers.clear()
-    root.addHandler(handler)
-    root.setLevel(logging.NOTSET)
 
-    for name in ["uvicorn", "uvicorn.error", "uvicorn.access"]:
+    for h in root.handlers[:]:
+        root.removeHandler(h)
+
+    root.setLevel(logging.NOTSET)
+    root.addHandler(handler)
+
+    for name in [
+        "uvicorn",
+        "uvicorn.error",
+        "uvicorn.access",
+        "asyncio"
+    ]:
         logger = logging.getLogger(name)
-        logger.handlers.clear()
+
+        for h in logger.handlers[:]:
+            logger.removeHandler(h)
+
         logger.propagate = True
+
+        logger.setLevel(logging.NOTSET)
