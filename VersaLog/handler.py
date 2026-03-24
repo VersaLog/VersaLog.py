@@ -6,15 +6,11 @@ class VersaLogHandler(logging.Handler):
         self.versalog = versalog
 
     def emit(self, record):
-        msg = self.format(record)
+        msg = record.getMessage()
 
-        if record.levelno >= logging.CRITICAL:
-            self.versalog.critical(msg)
-        elif record.levelno >= logging.ERROR:
+        if record.levelno >= logging.ERROR:
             self.versalog.error(msg)
-        elif record.levelno >= logging.WARNING:
-            self.versalog.warning(msg)
-        elif record.levelno >= logging.INFO:
-            self.versalog.info(msg)
-        else:
+        elif record.levelno == logging.DEBUG:
             self.versalog.debug(msg)
+        else:
+            self.versalog.info(msg)
