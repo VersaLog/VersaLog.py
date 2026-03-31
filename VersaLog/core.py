@@ -87,7 +87,7 @@ class VersaLog:
             if self.save_levels is None:
                 self.save_levels = self.valid_save_levels.copy()
             elif not isinstance(self.save_levels, list):
-                raise ValueError(f"save_levels must be a list. Example: ['ERROR']")
+                raise ValueError("save_levels must be a list. Example: ['ERROR']")
             elif not all(level in self.valid_save_levels for level in self.save_levels):
                 raise ValueError(f"Invalid save_levels specified. Valid levels are: {', '.join(self.valid_save_levels)}")
             
