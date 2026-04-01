@@ -179,42 +179,39 @@ class VersaLog:
             tags = [final_tag] if final_tag else []
         else:
             tags = []
-        tag_str = "".join(f"[{t}]" for t in tags) if tags else ""
+        tag_str = "".join(f"[{t}]" for t in tags)
 
         caller = self._GetCaller() if self.show_file or self.enum == "file" else ""
 
         if self.enum == "simple":
             symbol = self.SYMBOLS.get(tye, "[?]")
             if self.show_file:
-                formatted = f"[{caller}]{tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"[{caller}]{colors}{symbol}{self.RESET} {msg}"
-                plain = f"[{caller}]{tag_str}{symbol} {msg}" if tag_str else f"[{caller}]{symbol} {msg}"
+                # tag_str is empty string if no tags, otherwise formatted as "[tag1][tag2]..."
+                formatted = f"[{caller}]{tag_str}{colors}{symbol}{self.RESET} {msg}"
+                plain = f"[{caller}]{tag_str}{symbol} {msg}"
             else:
-                formatted = f"{tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"{colors}{symbol}{self.RESET} {msg}"
-                plain = f"{tag_str}{symbol} {msg}" if tag_str else f"{symbol} {msg}"
+                formatted = f"{tag_str}{colors}{symbol}{self.RESET} {msg}"
+                plain = f"{tag_str}{symbol} {msg}"
 
         elif self.enum == "simple2":
             symbol = self.SYMBOLS.get(tye, "[?]")
             time = self._GetTime()
             if self.show_file:
-                formatted = f"[{time}] [{caller}]{tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"[{time}] [{caller}]{colors}{symbol}{self.RESET} {msg}"
-                plain = f"[{time}] [{caller}]{tag_str}{symbol} {msg}" if tag_str else f"[{time}] [{caller}]{symbol} {msg}"
+                formatted = f"[{time}] [{caller}]{tag_str}{colors}{symbol}{self.RESET} {msg}"
+                plain = f"[{time}] [{caller}]{tag_str}{symbol} {msg}"
             else:
-                formatted = f"[{time}] {tag_str}{colors}{symbol}{self.RESET} {msg}" if tag_str else f"[{time}] {colors}{symbol}{self.RESET} {msg}"
-                plain = f"[{time}] {tag_str}{symbol} {msg}" if tag_str else f"[{time}] {symbol} {msg}"
+                formatted = f"[{time}] {tag_str}{colors}{symbol}{self.RESET} {msg}"
+                plain = f"[{time}] {tag_str}{symbol} {msg}"
 
         elif self.enum == "file":
-            formatted = f"[{caller}]{tag_str}{colors}[{types}]{self.RESET} {msg}" if tag_str else f"[{caller}]{colors}[{types}]{self.RESET} {msg}"
-            plain = f"[{caller}]{tag_str}[{types}] {msg}" if tag_str else f"[{caller}][{types}] {msg}"
+            formatted = f"[{caller}]{tag_str}{colors}[{types}]{self.RESET} {msg}"
+            plain = f"[{caller}]{tag_str}[{types}] {msg}"
 
         else:  # detailed
             time = self._GetTime()
-            formatted = f"[{time}]{colors}[{types}]{self.RESET}{tag_str}" if tag_str else f"[{time}]{colors}[{types}]{self.RESET}"
-            plain = f"[{time}][{types}]{tag_str}" if tag_str else f"[{time}][{types}]"
-            if self.show_file:
-                formatted += f"[{caller}]"
-                plain += f"[{caller}]"
-            formatted += f" : {msg}"
-            plain += f" : {msg}"
+            caller_part = f"[{caller}]" if self.show_file else ""
+            formatted = f"[{time}]{colors}[{types}]{self.RESET}{tag_str}{caller_part} : {msg}"
+            plain = f"[{time}][{types}]{tag_str}{caller_part} : {msg}"
 
         if not self.silent:
             print(formatted)
