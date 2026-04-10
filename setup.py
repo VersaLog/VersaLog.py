@@ -5,7 +5,7 @@ with open("README.md", encoding="utf-8") as f:
 
 setup(
     name="VersaLog",
-    version="2.5.5",
+    version="2.5.6",
     description="Versatile logging library.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -13,7 +13,9 @@ setup(
     license="MIT",
     packages=find_packages(include=["VersaLog", "VersaLog.*"]),
     include_package_data=True,
-    install_requires=[],
+    install_requires=[
+        "plyer"
+    ],
     python_requires=">=3.8, <3.14",
     url="",
     classifiers=[
