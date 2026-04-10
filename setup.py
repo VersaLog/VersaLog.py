@@ -13,7 +13,9 @@ setup(
     license="MIT",
     packages=find_packages(include=["VersaLog", "VersaLog.*"]),
     include_package_data=True,
-    install_requires=[],
+    install_requires=[
+        "plyer"
+    ],
     python_requires=">=3.8, <3.14",
     url="",
     classifiers=[
