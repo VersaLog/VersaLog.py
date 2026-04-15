@@ -7,8 +7,9 @@
 [![Discord](https://img.shields.io/badge/Discord-Support%20Server-7289DA?style=flat&logo=discord)](https://discord.gg/Ms2ejEES)
 
 What is VersaLog.py?
-VersaLog is a powerful and flexible logging library for Python.
-It supports everything from simple usage to advanced, highly customizable configurations to meet a wide range of needs.
+
+VersaLog is a modern, powerful, and flexible logging library for Python.
+It supports everything from simple usage to advanced, highly customizable configurations, making it suitable for a wide range of use cases.
 
 ## Feature
 
