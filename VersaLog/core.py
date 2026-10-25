@@ -2,6 +2,8 @@ from typing import Optional, Union, List
 from plyer import notification
 from contextlib import contextmanager
 
+from .integrations.webhook import WebhookHandler
+
 import datetime
 import inspect
 import os
@@ -73,6 +75,7 @@ class VersaLog:
         self.all_save = all_save
         self.save_levels = save_levels
         self.silent = silent
+        self._webhook_handlers = []
 
         self.log_queue = queue.Queue()
         self.worker_thread = threading.Thread(target=self._worker, daemon=True)
@@ -217,6 +220,32 @@ class VersaLog:
             print(formatted)
 
         self._save_log(plain, types)
+
+    def add_webhook(self, url: str, level: str = "ERROR", *, format: str = "generic", timeout: float = 3.0, headers: Optional[dict] = None,):
+        """Register a webhook destination for logs at or above ``level``.
+    
+        ``format`` can be ``"generic"``, ``"discord"``, or ``"slack"``.
+        The default ``"ERROR"`` sends ERROR and CRITICAL logs.
+        """
+        
+        handler = WebhookHandler(url=url, level=level, format=format, timeout=timeout, headers=headers)
+        self._webhook_handlers.append(handler)
+        return handler
+    
+    def remove_webhook(self, handler) -> bool:
+        try:
+            self._webhook_handlers.remove(handler)
+            return True
+        except ValueError:
+            return False
+    
+    def _dispatch_webhooks(self, message: str, level: str) -> None:
+        for handler in tuple(self._webhook_handlers):
+            if handler.should_handle(level):
+                try:
+                    handler.emit(message, level)
+                except Exception:
+                    pass
 
     def info(self, msg: str, tag: Optional[Union[str, List[str]]] = None) -> None:
         self._Log(msg, "INFO", tag)
