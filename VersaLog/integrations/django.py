@@ -1,5 +1,5 @@
 import logging
-from ..handler import VersaLogHandle
+from ..handler import VersaLogHandler
 
 
 def setup_django_logging(versalog):
