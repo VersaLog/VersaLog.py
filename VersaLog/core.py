@@ -220,6 +220,7 @@ class VersaLog:
             print(formatted)
 
         self._save_log(plain, types)
+        self._dispatch_webhooks(msg, types)
 
     def add_webhook(self, url: str, level: str = "ERROR", *, format: str = "generic", timeout: float = 3.0, headers: Optional[dict] = None,):
         """Register a webhook destination for logs at or above ``level``.
